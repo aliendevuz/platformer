@@ -184,8 +184,8 @@ function updateCamera() {
     const worldWidth = tilemap.length > 0 ? tilemap[0].length * TILE_SIZE : DISPLAY_WIDTH;
     const worldHeight = tilemap.length * TILE_SIZE;
     
-    camera.x = Math.max(0, Math.min(camera.x, worldWidth - DISPLAY_WIDTH));
-    camera.y = Math.max(0, Math.min(camera.y, worldHeight - DISPLAY_HEIGHT));
+    camera.x = Math.floor(Math.max(0, Math.min(camera.x, worldWidth - DISPLAY_WIDTH)));
+    camera.y = Math.floor(Math.max(0, Math.min(camera.y, worldHeight - DISPLAY_HEIGHT)));
 }
 
 // Check if tile is solid (brick)

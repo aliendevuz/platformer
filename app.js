@@ -114,7 +114,7 @@ class GameObject {
 
     draw(camera) {
         if (this.img != null) {
-            ctx.drawImage(this.img, (this.x - camera.x) * camera.scale, (this.y - camera.y) * camera.scale, this.w * camera.scale, this.h * camera.scale);
+            ctx.drawImage(this.img, Math.floor((this.x - camera.x) * camera.scale), Math.floor((this.y - camera.y) * camera.scale), Math.floor(this.w * camera.scale), Math.floor(this.h * camera.scale));
         }
     }
 }
@@ -123,9 +123,9 @@ class Camera {
     constructor(x, y, w, h, scale) {
         this.x = x; // Camera's x position in world coordinates
         this.y = y; // Camera's y position in world coordinates
-        this.w = w;
-        this.h = h;
         this.scale = scale;
+        this.w = w / scale;
+        this.h = h / scale;
         this.lerpSpeed = 0.1;
     }
 
@@ -133,11 +133,11 @@ class Camera {
         return a + (b - a) * t;
     }
 
-    setPos(x, y) {
+    setPos(target) {
 
         try {
-            this.x = x - this.w / 2 / this.scale;
-            this.y = y - this.h / 2 / this.scale;
+            this.x = target.x - this.w / 2 + target.w / 2;
+            this.y = target.y - this.h / 2 + target.h / 2;
         } catch (err) {
             console.log("Something went wrong on camera setPos!");
         }
@@ -147,20 +147,13 @@ class Camera {
 
         try {
             // Calculate the desired camera position
-            const targetX = target.x - this.w / 2 / this.scale;
-            const targetY = target.y - this.h / 2 / this.scale;
+            const targetX = target.x - this.w / 2 + target.w / 2;
+            const targetY = target.y - this.h / 2 + target.h / 2;
 
             // Smoothly interpolate the camera's current position towards the target position
             this.x = Math.floor(this.lerp(this.x, targetX, this.lerpSpeed));
             this.y = Math.floor(this.lerp(this.y, targetY, this.lerpSpeed));
             
-            // // Prevent camera from going outside the world bounds
-            // const mapWidth = tilemap[0].length * 4; // 4 is the tile size
-            // const mapHeight = tilemap.length * 4;
-            
-            // // Clamp camera position within the world bounds
-            // this.x = Math.max(0, Math.min(this.x, mapWidth - this.width));
-            // this.y = Math.max(0, Math.min(this.y, mapHeight - this.height));
         } catch (err) {
             console.log("Something went wrong on camera update!");
         }
@@ -208,7 +201,7 @@ class Tile extends GameObject {
 }
 
 // game objects
-const camera = new Camera(0, 0, canvas.width, canvas.height, 1.0);
+const camera = new Camera(0, 0, canvas.width, canvas.height, 2);
 let tilemap = [];
 const player = new Player(0, 0, bigBall, 16);
 
@@ -222,7 +215,7 @@ function initGame() {
             for (let x = 0; x < t[y].length; x++) {
                 if (t[y][x].tile === 'p') {
                     player.setPos(x * 40, y * 40);
-                    camera.setPos(player.x, player.y);
+                    camera.setPos(player);
                     break;
                 }
             }
