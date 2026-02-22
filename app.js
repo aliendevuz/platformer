@@ -2,7 +2,7 @@ const info = document.getElementById('info');
 const canvas = document.getElementById('playground');
 const ctx = canvas.getContext('2d');
 
-const fixer = 8;
+const fixer = 2;
 
 // Keyboard input
 const keys = {};
@@ -22,6 +22,14 @@ resize();
 
 document.addEventListener('touchmove', function(e) {
   e.preventDefault(); // Telegram WebView ichida ham scrollni bloklaydi
+}, { passive: false });
+
+// Right-click / context menu bloklash
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Mouse wheel + Ctrl (zoom) bloklash
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) e.preventDefault(); 
 }, { passive: false });
 
 // loadAssets
