@@ -2,6 +2,8 @@ const info = document.getElementById('info');
 const canvas = document.getElementById('playground');
 const ctx = canvas.getContext('2d');
 
+const fixer = 8;
+
 // Keyboard input
 const keys = {};
 
@@ -10,8 +12,9 @@ window.addEventListener('keyup', e => keys[e.key] = false);
 
 // rescale canvas
 function resize() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    canvas.width = canvas.offsetWidth * fixer;
+    canvas.height = canvas.offsetHeight * fixer;
+    console.log(canvas.width, canvas.height);
 }
 
 window.addEventListener('resize', resize);
@@ -201,7 +204,7 @@ class Tile extends GameObject {
 }
 
 // game objects
-const camera = new Camera(0, 0, canvas.width, canvas.height, 2);
+const camera = new Camera(0, 0, canvas.width, canvas.height, 2 * fixer);
 let tilemap = [];
 const player = new Player(0, 0, bigBall, 16);
 
