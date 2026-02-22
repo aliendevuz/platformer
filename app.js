@@ -20,6 +20,10 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+document.addEventListener('touchmove', function(e) {
+  e.preventDefault(); // Telegram WebView ichida ham scrollni bloklaydi
+}, { passive: false });
+
 // loadAssets
 function loadImage(name) {
     const image = new Image();
