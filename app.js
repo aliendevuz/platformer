@@ -14,7 +14,6 @@ window.addEventListener('keyup', e => keys[e.key] = false);
 function resize() {
     canvas.width = canvas.offsetWidth * fixer;
     canvas.height = canvas.offsetHeight * fixer;
-    console.log(canvas.width, canvas.height);
 }
 
 window.addEventListener('resize', resize);
@@ -129,15 +128,15 @@ class GameObject {
 
     draw(camera) {
         if (this.img != null) {
-            ctx.drawImage(this.img, Math.floor((this.x - camera.x) * camera.scale), Math.floor((this.y - camera.y) * camera.scale), Math.floor(this.w * camera.scale), Math.floor(this.h * camera.scale));
+            ctx.drawImage(this.img, (this.x - camera.x) * camera.scale, (this.y - camera.y) * camera.scale, this.w * camera.scale, this.h * camera.scale);
         }
     }
 }
 
 class Camera {
     constructor(x, y, w, h, scale) {
-        this.x = x; // Camera's x position in world coordinates
-        this.y = y; // Camera's y position in world coordinates
+        this.x = x;
+        this.y = y;
         this.scale = scale;
         this.w = w / scale;
         this.h = h / scale;
@@ -149,29 +148,18 @@ class Camera {
     }
 
     setPos(target) {
-
-        try {
-            this.x = target.x - this.w / 2 + target.w / 2;
-            this.y = target.y - this.h / 2 + target.h / 2;
-        } catch (err) {
-            console.log("Something went wrong on camera setPos!");
-        }
+        this.x = target.x - this.w / 2 + target.w / 2;
+        this.y = target.y - this.h / 2 + target.h / 2;
     }
 
     update(target) {
+        // Calculate the desired camera position
+        const targetX = target.x - this.w / 2 + target.w / 2;
+        const targetY = target.y - this.h / 2 + target.h / 2;
 
-        try {
-            // Calculate the desired camera position
-            const targetX = target.x - this.w / 2 + target.w / 2;
-            const targetY = target.y - this.h / 2 + target.h / 2;
-
-            // Smoothly interpolate the camera's current position towards the target position
-            this.x = Math.floor(this.lerp(this.x, targetX, this.lerpSpeed));
-            this.y = Math.floor(this.lerp(this.y, targetY, this.lerpSpeed));
-            
-        } catch (err) {
-            console.log("Something went wrong on camera update!");
-        }
+        // Smoothly interpolate the camera's current position towards the target position
+        this.x = this.lerp(this.x, targetX, this.lerpSpeed);
+        this.y = this.lerp(this.y, targetY, this.lerpSpeed);
     }
 }
 
@@ -278,7 +266,6 @@ function drawGame() {
     }
 
     // Draw the player at the camera's adjusted position
-    info.textContent = `${camera.x}, ${camera.y}, ${player.x}, ${player.y}`;
     player.draw(camera);
 }
 
