@@ -206,7 +206,7 @@ class Tile extends GameObject {
 // game objects
 const camera = new Camera(0, 0, canvas.width, canvas.height, 2 * fixer);
 let tilemap = [];
-const player = new Player(0, 0, bigBall, 16);
+const player = new Player(0, 0, bigBall, 20);
 
 function initGame() {
     // initialize game
