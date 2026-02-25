@@ -2,7 +2,8 @@ const info = document.getElementById('info');
 const canvas = document.getElementById('playground');
 const ctx = canvas.getContext('2d');
 
-const fixer = 2;
+const res = 2;
+let resolution = res;
 
 // Keyboard input
 const keys = {};
@@ -10,25 +11,18 @@ const keys = {};
 window.addEventListener('keydown', e => keys[e.key] = true);
 window.addEventListener('keyup', e => keys[e.key] = false);
 
-// rescale canvas
-function resize() {
-    canvas.width = canvas.offsetWidth * fixer;
-    canvas.height = canvas.offsetHeight * fixer;
-}
-
-window.addEventListener('resize', resize);
-resize();
-
 document.addEventListener('touchmove', function(e) {
-  e.preventDefault(); // Telegram WebView ichida ham scrollni bloklaydi
+    e.preventDefault(); // Telegram WebView ichida ham scrollni bloklaydi
 }, { passive: false });
 
 // Right-click / context menu bloklash
-document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+});
 
 // Mouse wheel + Ctrl (zoom) bloklash
 document.addEventListener('wheel', function(e) {
-  if (e.ctrlKey) e.preventDefault(); 
+    if (e.ctrlKey) e.preventDefault(); 
 }, { passive: false });
 
 // loadAssets
@@ -55,7 +49,7 @@ async function loadTilemap(url) {
         const response = await fetch(url);
         const text = await response.text();
         const lines = text.trim().split('\n');
-        const size = 40;
+        const size = TILE_SIZE;
         const tilemap = lines.map((line, rowIndex) => {
             return line.split('').map((char, colIndex) => {
                 return new Tile(colIndex * size, rowIndex * size, size, size, char);
@@ -131,6 +125,11 @@ class GameObject {
             ctx.drawImage(this.img, (this.x - camera.x) * camera.scale, (this.y - camera.y) * camera.scale, this.w * camera.scale, this.h * camera.scale);
         }
     }
+
+    resize({w, h}) {
+        this.w = w;
+        this.h = h;
+    }
 }
 
 class Camera {
@@ -138,6 +137,12 @@ class Camera {
         this.x = x;
         this.y = y;
         this.scale = scale;
+        this.w = w / scale;
+        this.h = h / scale;
+        this.lerpSpeed = 0.1;
+    }
+
+    resize({w, h}) {
         this.w = w / scale;
         this.h = h / scale;
         this.lerpSpeed = 0.1;
@@ -154,8 +159,8 @@ class Camera {
 
     update(target) {
         // Calculate the desired camera position
-        const targetX = target.x - this.w / 2 + target.w / 2;
-        const targetY = target.y - this.h / 2 + target.h / 2;
+        const targetX = target.x - this.w / (2 * resolution) + target.w / 2;
+        const targetY = target.y - this.h / (2 * resolution) + target.h / 2;
 
         // Smoothly interpolate the camera's current position towards the target position
         this.x = this.lerp(this.x, targetX, this.lerpSpeed);
@@ -178,6 +183,17 @@ class Player extends GameObject {
         this.x += dx;
         this.y += dy;
     }
+
+    // draw(camera) {
+    //     if (this.img != null) {
+    //         ctx.drawImage(this.img, (this.x - camera.x) * camera.scale, (this.y - camera.y) * camera.scale, this.w * camera.scale, this.h * camera.scale);
+            // for (let x = -7; x <= 7; x++) {
+            //     for (let y = -4; y <= 4; y++) {
+            //         ctx.drawImage(this.img, (this.x - camera.x + x * this.w) * camera.scale, (this.y - camera.y + y * this.h) * camera.scale, this.w * camera.scale, this.h * camera.scale);
+            //     }
+            // }
+    //     }
+    // }
 
     // draw(camera) {
     //     drawVectorImage(this.x - camera.x, this.y - camera.y, this.w * camera.scale, this.h * camera.scale, 'circle');
@@ -204,9 +220,90 @@ class Tile extends GameObject {
 }
 
 // game objects
-const camera = new Camera(0, 0, canvas.width, canvas.height, 2 * fixer);
+const MIN_WIDTH = 14;
+const MIN_HEIGHT = 8;
+
+let TILE_SIZE = 12;
+
+const scale = 1;
+let callibrate = 1;
+const camera = new Camera(0, 0, canvas.width, canvas.height, scale * callibrate * resolution);
 let tilemap = [];
-const player = new Player(0, 0, bigBall, 20);
+const player = new Player(0, 0, bigBall, TILE_SIZE / 2);
+
+// rescale canvas
+function resize() {
+    
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    if (width > height) {
+        if (width < 1920) {
+            resolution = res; // 2 or 4 or 8
+                        // 1200  600  50
+        } else {
+            resolution = 1;
+        }
+    } else {
+        if (height < 1920) {
+            resolution = res; // 2 or 4 or 8
+        } else {
+            resolution = 1;
+        }
+    }
+
+    const TILE_WIDTH = width / MIN_WIDTH;
+    const TILE_HEIGHT = height / MIN_HEIGHT;
+
+    if (TILE_WIDTH < TILE_HEIGHT) {
+        TILE_SIZE = TILE_WIDTH;
+    } else {
+        TILE_SIZE = TILE_HEIGHT;
+    }
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    canvas.width = width * resolution;
+    canvas.height = height * resolution;
+
+    try {
+        camera.resize({w: canvas.width, h: canvas.height});
+
+        loadTilemap('assets/tilemaps/level1.lvl').then(t => {
+            tilemap = t;
+            
+            // Find player start position
+            for (let y = 0; y < t.length; y++) {
+                for (let x = 0; x < t[y].length; x++) {
+                    if (t[y][x].tile === 'p') {
+                        player.setPos(x * TILE_SIZE, y * TILE_SIZE);
+                        break;
+                    }
+                }
+            }
+        });
+        // for (let y = 0; y < tilemap.length; y++) {
+        //     for (let x = 0; x < tilemap[y].length; x++) {
+        //         tilemap[y][x].resize({w: TILE_SIZE, h: TILE_SIZE});
+        //     }
+        // }
+        
+        player.resize({w: TILE_SIZE, h: TILE_SIZE})
+    } catch (error) {
+        console.log("Failed to upgrade camera");
+    }
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', resize);
+}
+
+resize();
 
 function initGame() {
     // initialize game
@@ -217,7 +314,7 @@ function initGame() {
         for (let y = 0; y < t.length; y++) {
             for (let x = 0; x < t[y].length; x++) {
                 if (t[y][x].tile === 'p') {
-                    player.setPos(x * 40, y * 40);
+                    player.setPos(x * TILE_SIZE, y * TILE_SIZE);
                     camera.setPos(player);
                     break;
                 }
