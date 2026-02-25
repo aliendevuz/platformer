@@ -142,7 +142,8 @@ class Camera {
         this.lerpSpeed = 0.1;
     }
 
-    resize({w, h}) {
+    resize({w, h, rescale}) {
+        this.scale = rescale;
         this.w = w / scale;
         this.h = h / scale;
         this.lerpSpeed = 0.1;
@@ -238,20 +239,38 @@ function resize() {
     const width = rect.width;
     const height = rect.height;
 
-    if (width > height) {
-        if (width < 1920) {
-            resolution = res; // 2 or 4 or 8
-                        // 1200  600  50
-        } else {
-            resolution = 1;
-        }
+    const base = width > height ? width : height;
+    
+    if (base > 1920) {
+        resolution = 1;
+    } else if (base > 1024) {
+        resolution = 2;
+    } else if (base > 320) {
+        resolution = 4;
+    } else if (base > 256) {
+        resolution = 8;
     } else {
-        if (height < 1920) {
-            resolution = res; // 2 or 4 or 8
-        } else {
-            resolution = 1;
-        }
+        resolution = 10;
     }
+
+    const info = document.getElementById("info");
+    info.textContent = `${resolution}`;
+
+    // if (width > height) {
+    //     if (width < 1920) {
+    //         resolution = res; // 2 or 4 or 8
+    //                     // 1200  600  50
+            
+    //     } else {
+    //         resolution = 1;
+    //     }
+    // } else {
+    //     if (height < 1920) {
+    //         resolution = res; // 2 or 4 or 8
+    //     } else {
+    //         resolution = 1;
+    //     }
+    // }
 
     const TILE_WIDTH = width / MIN_WIDTH;
     const TILE_HEIGHT = height / MIN_HEIGHT;
@@ -269,7 +288,7 @@ function resize() {
     canvas.height = height * resolution;
 
     try {
-        camera.resize({w: canvas.width, h: canvas.height});
+        camera.resize({w: canvas.width, h: canvas.height, rescale: scale * callibrate * resolution});
 
         loadTilemap('assets/tilemaps/level1.lvl').then(t => {
             tilemap = t;
