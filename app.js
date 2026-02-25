@@ -1,5 +1,6 @@
 const canvas = document.getElementById('playground');
 const ctx = canvas.getContext('2d');
+const btn = document.getElementById('fullscreen-btn');
 
 const RESOLUTION = window.devicePixelRatio || 1;
 
@@ -12,6 +13,19 @@ window.addEventListener('keyup', e => keys[e.key] = false);
 document.addEventListener('touchmove', function(e) {
     e.preventDefault(); // Telegram WebView ichida ham scrollni bloklaydi
 }, { passive: false });
+
+if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    btn.style.display = 'block';
+}
+
+btn.addEventListener('click', () => {
+    canvas.requestFullscreen?.() ||
+    canvas.webkitRequestFullscreen?.() ||
+    canvas.msRequestFullscreen?.();
+    btn.style.display = 'none';
+
+    resize();
+});
 
 // Right-click / context menu bloklash
 document.addEventListener('contextmenu', (e) => {
