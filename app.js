@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const btn = document.getElementById('fullscreen-btn');
 
 let RESOLUTION = window.devicePixelRatio || 1;
+let isReady = false;
 
 // Keyboard input
 const keys = {};
@@ -240,6 +241,12 @@ function resize() {
     });
     
     player.resize(TILE_SIZE / 2)
+
+    
+    setTimeout(() => {
+        isReady = true;
+        document.body.style.opacity = 1;
+    }, 300)
 }
 
 window.addEventListener('resize', resize);
@@ -299,17 +306,20 @@ function animate() {
     // clear screen
     clearScreen();
 
-    // control
-    handleEvent();
+    if (isReady) {
 
-    // update player
-    updateGame();
+        // control
+        handleEvent();
     
-    // update camera
-    updateCamera();
-
-    // draw game
-    drawGame();
+        // update player
+        updateGame();
+        
+        // update camera
+        updateCamera();
+    
+        // draw game
+        drawGame();
+    }
 
     requestAnimationFrame(animate);
 }

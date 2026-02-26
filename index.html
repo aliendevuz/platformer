@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platformer game development</title>
+    <link rel="preload" href="/styles.css" as="style">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preload" href="/app.js" as="script">
+    <link rel="preload" href="/assets/image/big-ball.svg" as="image">
+    <link rel="preload" href="/assets/image/brick.svg" as="image">
+    <link rel="preload" href="/assets/tilemaps/level1.lvl" as="fetch" crossorigin>
     <link rel="manifest" href="/manifest.json">
 </head>
 <body>
-    <canvas id="playground"></canvas>
+    <canvas id="playground" class="invisible"></canvas>
     <p id="info" class="info">i</p>
     <button id="fullscreen-btn">full screen</button>
     <script src="app.js"></script>
