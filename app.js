@@ -220,6 +220,8 @@ function resize() {
     canvas.width = Math.round(width * RESOLUTION);
     canvas.height = Math.round(height * RESOLUTION);
 
+    document.getElementById("info").textContent = `${RESOLUTION} | ${canvas.width} : ${canvas.height}`;
+
     camera.resize({w: canvas.width, h: canvas.height, scale: scale * RESOLUTION});
 
     loadTilemap('assets/tilemaps/level1.lvl').then(t => {
