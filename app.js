@@ -16,7 +16,7 @@ document.addEventListener('touchmove', function(e) {
 }, { passive: false });
 
 if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-    btn.style.display = 'block';
+    // btn.style.display = 'block';
 }
 
 btn.addEventListener('click', () => {
@@ -221,7 +221,7 @@ function resize() {
     canvas.width = Math.round(width * RESOLUTION);
     canvas.height = Math.round(height * RESOLUTION);
 
-    document.getElementById("info").textContent = `${RESOLUTION} | ${canvas.width} : ${canvas.height}`;
+    // document.getElementById("info").textContent = `${RESOLUTION} | ${canvas.width} : ${canvas.height}`;
 
     camera.resize({w: canvas.width, h: canvas.height, scale: scale * RESOLUTION});
 
@@ -246,7 +246,7 @@ function resize() {
     setTimeout(() => {
         isReady = true;
         document.body.style.opacity = 1;
-    }, 300)
+    }, 200)
 }
 
 window.addEventListener('resize', resize);
