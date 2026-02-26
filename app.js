@@ -315,3 +315,10 @@ function animate() {
 }
 
 animate();
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js")
+    .catch(() => {
+      console.log("SW qo'llab-quvvatlanmadi");
+    });
+}
