@@ -2,7 +2,7 @@ const canvas = document.getElementById('playground');
 const ctx = canvas.getContext('2d');
 const btn = document.getElementById('fullscreen-btn');
 
-const RESOLUTION = window.devicePixelRatio || 1;
+let RESOLUTION = window.devicePixelRatio || 1;
 
 // Keyboard input
 const keys = {};
@@ -112,7 +112,8 @@ class Camera {
         this.lerpSpeed = 0.1;
     }
 
-    resize({w, h}) {
+    resize({w, h, scale}) {
+        this.scale = scale;
         this.w = w / scale;
         this.h = h / scale;
     }
@@ -122,14 +123,14 @@ class Camera {
     }
 
     setPos(target) {
-        this.x = target.x - this.w / (2 * RESOLUTION) + target.w / 2;
-        this.y = target.y - this.h / (2 * RESOLUTION) + target.h / 2;
+        this.x = target.x - this.w / 2 + target.w / 2;
+        this.y = target.y - this.h / 2 + target.h / 2;
     }
 
     update(target) {
         // Calculate the desired camera position
-        const targetX = target.x - this.w / (2 * RESOLUTION) + target.w / 2;
-        const targetY = target.y - this.h / (2 * RESOLUTION) + target.h / 2;
+        const targetX = target.x - this.w / 2 + target.w / 2;
+        const targetY = target.y - this.h / 2 + target.h / 2;
 
         // Smoothly interpolate the camera's current position towards the target position
         this.x = this.lerp(this.x, targetX, this.lerpSpeed);
@@ -199,6 +200,8 @@ const player = new Player(0, 0, bigBall, TILE_SIZE / 2);
 // rescale canvas
 function resize() {
     
+    RESOLUTION = window.devicePixelRatio || 1;
+    
     const rect = canvas.parentElement.getBoundingClientRect();
     const {width, height} = rect;
 
@@ -217,7 +220,7 @@ function resize() {
     canvas.width = Math.round(width * RESOLUTION);
     canvas.height = Math.round(height * RESOLUTION);
 
-    camera.resize({w: canvas.width, h: canvas.height});
+    camera.resize({w: canvas.width, h: canvas.height, scale: scale * RESOLUTION});
 
     loadTilemap('assets/tilemaps/level1.lvl').then(t => {
         tilemap = t;
