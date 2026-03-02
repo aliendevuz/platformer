@@ -1,4 +1,4 @@
-const CACHE_NAME = "v1.0.2";
+const CACHE_NAME = "bounce-v2.0";
 
 const urlsToCache = [
   "/",
@@ -8,6 +8,16 @@ const urlsToCache = [
   "/assets/image/big-ball.svg",
   "/assets/image/brick.svg",
   "/assets/tilemaps/level1.lvl",
+  "/assets/tilemaps/level2.lvl",
+  "/assets/tilemaps/level3.lvl",
+  "/assets/tilemaps/level4.lvl",
+  "/assets/tilemaps/level5.lvl",
+  "/assets/tilemaps/level6.lvl",
+  "/assets/tilemaps/level7.lvl",
+  "/assets/tilemaps/level8.lvl",
+  "/assets/tilemaps/level9.lvl",
+  "/assets/tilemaps/level10.lvl",
+  "/assets/tilemaps/level11.lvl",
 ];
 
 self.addEventListener("install", event => {
